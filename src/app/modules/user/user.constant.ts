@@ -1,7 +1,8 @@
 export const USER_ROLE = {
+  super_admin: "super_admin",
+  sub_admin: "sub_admin",
   admin: "admin",
-  vendor: "vendor",
   user: "user",
-  all: ["admin", "vendor", "user"].join(","),
+  vendor: "vendor",
 };
 export const UserStatus = ["pending", "active", "blocked"];
