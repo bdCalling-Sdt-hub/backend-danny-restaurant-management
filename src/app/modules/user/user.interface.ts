@@ -11,9 +11,14 @@ export interface TUser {
   name: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
-  role: "admin" | "super_admin" | "user";
+  role: "admin" | "super_admin" | "user" | "sub_admin";
   isDeleted: boolean;
   image?: string;
+  verification: {
+    otp: string | number;
+    expiresAt: Date;
+    status: boolean;
+  };
 }
 
 export interface UserModel extends Model<TUser> {

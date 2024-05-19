@@ -1,8 +1,7 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import { TUser, UserModel } from "./user.interface";
 import config from "../../config";
 import bcrypt from "bcrypt";
-import { ObjectId } from "mongodb";
 const userSchema = new Schema<TUser, UserModel>(
   {
     name: {
@@ -26,11 +25,13 @@ const userSchema = new Schema<TUser, UserModel>(
       type: String,
       required: true,
     },
-    branch: {
-      type: ObjectId,
-    },
+
     passwordChangedAt: {
       type: Date,
+    },
+    branch: {
+      type: mongoose.Types.ObjectId,
+      ref: "Branch",
     },
     needsPasswordChange: {
       type: Boolean,
@@ -38,7 +39,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ["super_admin", "admin", "user"],
+      enum: ["super_admin", "admin", "user", "sub_admin"],
     },
     isDeleted: {
       type: Boolean,
@@ -46,6 +47,21 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     phoneNumber: {
       type: String,
+    },
+    verification: {
+      otp: {
+        type: String,
+        select: 0,
+      },
+      expiresAt: {
+        type: Date,
+        select: 0,
+      },
+      status: {
+        type: Boolean,
+        default: false,
+        select: 0,
+      },
     },
   },
   {

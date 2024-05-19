@@ -5,14 +5,14 @@ import { userServices } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
 import { storeFile } from "../../utils/fileHelper";
 const insertuserIntoDb = catchAsync(async (req: Request, res: Response) => {
-  // if (req?.file) {
-  //   req.body.image = storeFile("profile", req?.file?.filename);
-  // }
+  if (req?.file) {
+    req.body.image = storeFile("profile", req?.file?.filename);
+  }
   const result = await userServices.insertSubAdminIntoDb(req.body);
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Userser created successfully",
+    message: "User created successfully",
     data: result,
   });
 });
@@ -31,7 +31,6 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
     req.body.image = storeFile("profile", req?.file?.filename);
   }
-  console.log(req.body);
   const result = await userServices.updateProfile(req.user.userId, req.body);
   sendResponse(res, {
     statusCode: 200,
@@ -46,8 +45,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: "users retrived successfully",
-    data: result?.data,
-    meta: result?.meta,
+    data: result,
   });
 });
 const getsingleUser = catchAsync(async (req: Request, res: Response) => {
@@ -63,7 +61,6 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
     req.body.image = storeFile("profile", req?.file?.filename);
   }
-  console.log(req.body);
   const result = await userServices.updateUser(req.params.id, req.body);
   sendResponse(res, {
     statusCode: 200,
@@ -73,7 +70,6 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const deleteAccount = catchAsync(async (req: Request, res: Response) => {
-  console.log(req.body, "DD");
   const result = await userServices.deleteAccount(
     req?.user?.userId,
     req?.body?.password

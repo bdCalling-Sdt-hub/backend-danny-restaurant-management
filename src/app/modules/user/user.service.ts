@@ -52,18 +52,9 @@ const updateProfile = async (
 };
 
 const getAllusers = async (query: Record<string, any>) => {
-  const userModel = new QueryBuilder(User.find(), query)
-    .search(["email", "fullName"])
-    .filter()
-    .paginate()
-    .sort()
-    .fields();
-  const data = await userModel.modelQuery;
-  const meta = await userModel.countTotal();
-  return {
-    data,
-    meta,
-  };
+  const result = await User.find(query);
+
+  return result;
 };
 
 const getSingleUser = async (id: string) => {
@@ -82,6 +73,7 @@ const updateUser = async (
   if (payload?.role) {
     throw new AppError(httpStatus?.BAD_REQUEST, "role is not for update");
   }
+
   const result = await User.findByIdAndUpdate(id, payload, { new: true });
 
   if (result && payload?.image) {

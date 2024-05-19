@@ -8,57 +8,54 @@ const upload = fileUpload("./public/uploads/profile/");
 const router = Router();
 router.post(
   "/create-user",
+  auth(USER_ROLE.super_admin),
   upload.single("file"),
   parseData(),
   userControllers.insertuserIntoDb
 );
 router.patch(
   "/update/:id",
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.super_admin),
   upload.single("file"),
   parseData(),
   userControllers.updateUser
 );
 router.patch(
   "/",
-  auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.vendor),
+  auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
   upload.single("file"),
   parseData(),
   userControllers.updateProfile
 );
 router.get(
-  "/",
-  auth(USER_ROLE.vendor, USER_ROLE.admin),
+  "/all",
+  auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
   userControllers.getAllUsers
 );
 router.get(
   "/",
-  auth(USER_ROLE.user, USER_ROLE.admin, USER_ROLE.vendor),
+  auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
   userControllers.getme
 );
 
 router.get(
   "/:id",
-  auth(USER_ROLE.vendor, USER_ROLE.admin),
+  auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
   userControllers.getsingleUser
 );
 router.patch(
   "/update/:id",
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.super_admin),
   upload.single("file"),
   parseData(),
   userControllers.updateUser
 );
 router.patch(
   "/:id",
-  auth(USER_ROLE.user),
+  auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
   upload.single("file"),
   parseData(),
   userControllers.updateProfile
 );
-router.delete(
-  "/",
-  auth(USER_ROLE.vendor, USER_ROLE.user),
-  userControllers.deleteAccount
-);
+router.delete("/", auth(USER_ROLE.super_admin), userControllers.deleteAccount);
 export const userRoutes = router;

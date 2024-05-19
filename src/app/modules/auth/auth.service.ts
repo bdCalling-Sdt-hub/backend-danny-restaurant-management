@@ -52,19 +52,18 @@ const login = async (payload: Tlogin) => {
 // change password
 
 const changePassword = async (id: string, payload: TchangePassword) => {
-  console.log(payload);
   const user = await User.IsUserExistbyId(id);
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "user not found");
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
 
   if (!(await User.isPasswordMatched(payload?.oldPassword, user.password))) {
-    throw new AppError(httpStatus.FORBIDDEN, "old password do not match!");
+    throw new AppError(httpStatus.FORBIDDEN, "Old password do not match!");
   }
   if (payload?.newPassword !== payload?.confirmPassword) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "old password and new password do not match"
+      "New password and confirm password do not match!"
     );
   }
   const hashedPassword = await bcrypt.hash(
@@ -172,10 +171,8 @@ const resetPassword = async (token: string, payload: TresetPassword) => {
 
 const refreshToken = async (token: string) => {
   // checking if the given token is valid
-  console.log("hitted");
   const decoded = verifyToken(token, config.jwt_refresh_secret as string);
   const { userId } = decoded;
-  console.log(decoded);
   const user = await User.IsUserExistbyId(userId);
 
   if (!user) {

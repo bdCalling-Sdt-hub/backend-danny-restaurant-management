@@ -15,7 +15,7 @@ router.post(
 );
 router.patch(
   "/change-password",
-  auth(USER_ROLE.admin, USER_ROLE.vendor, USER_ROLE.user),
+  auth(USER_ROLE.sub_admin, USER_ROLE.super_admin),
   authControllers.changePassword
 );
 router.patch("/forgot-password", authControllers.forgotPassword);
