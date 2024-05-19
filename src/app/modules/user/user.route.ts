@@ -8,15 +8,9 @@ const upload = fileUpload("./public/uploads/profile/");
 const router = Router();
 router.post(
   "/create-user",
-  // upload.single("file"),
-  // parseData(),
-  userControllers.insertuserIntoDb
-);
-router.post(
-  "/create-vendor",
   upload.single("file"),
   parseData(),
-  userControllers.insertVendorIntoDb
+  userControllers.insertuserIntoDb
 );
 router.patch(
   "/update/:id",
@@ -33,7 +27,7 @@ router.patch(
   userControllers.updateProfile
 );
 router.get(
-  "/all",
+  "/",
   auth(USER_ROLE.vendor, USER_ROLE.admin),
   userControllers.getAllUsers
 );

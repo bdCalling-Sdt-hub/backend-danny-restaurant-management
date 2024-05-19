@@ -5,4 +5,3 @@ export const USER_ROLE = {
   user: "user",
   vendor: "vendor",
 };
-export const UserStatus = ["pending", "active", "blocked"];

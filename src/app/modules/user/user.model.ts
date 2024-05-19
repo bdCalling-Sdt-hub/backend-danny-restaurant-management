@@ -1,32 +1,33 @@
 import { Schema, model } from "mongoose";
 import { TUser, UserModel } from "./user.interface";
-import { UserStatus } from "./user.constant";
 import config from "../../config";
 import bcrypt from "bcrypt";
-import { string } from "zod";
+import { ObjectId } from "mongodb";
 const userSchema = new Schema<TUser, UserModel>(
   {
-    // userName: {
-    //   type: String,
-    //   required: [true, "userName is required"],
-    // },
-    fullName: {
+    name: {
       type: String,
-      required: [true, "fullName is required"],
+      required: true,
     },
     image: {
       type: String,
-      default: "",
     },
     email: {
       type: String,
-      required: [true, "email is required"],
+      required: true,
       unique: true,
     },
     password: {
       type: String,
-      required: [true, "password is required"],
+      required: true,
       select: 0,
+    },
+    designation: {
+      type: String,
+      required: true,
+    },
+    branch: {
+      type: ObjectId,
     },
     passwordChangedAt: {
       type: Date,
@@ -37,12 +38,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ["admin", "vendor", "user"],
-    },
-    status: {
-      type: String,
-      enum: UserStatus,
-      default: "active",
+      enum: ["super_admin", "admin", "user"],
     },
     isDeleted: {
       type: Boolean,
@@ -50,22 +46,6 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     phoneNumber: {
       type: String,
-      required: [true, "phoneNumber is required"],
-    },
-    verification: {
-      otp: {
-        type: String,
-        select: 0,
-      },
-      expiresAt: {
-        type: Date,
-        select: 0,
-      },
-      status: {
-        type: Boolean,
-        default: false,
-        select: 0,
-      },
     },
   },
   {

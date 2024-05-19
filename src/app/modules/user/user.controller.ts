@@ -1,3 +1,4 @@
+import { User } from "./user.model";
 import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
 import { userServices } from "./user.service";
@@ -7,21 +8,11 @@ const insertuserIntoDb = catchAsync(async (req: Request, res: Response) => {
   // if (req?.file) {
   //   req.body.image = storeFile("profile", req?.file?.filename);
   // }
-  const result = await userServices.insertUserIntoDb(req.body);
+  const result = await userServices.insertSubAdminIntoDb(req.body);
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "user created successfully",
-    data: result,
-  });
-});
-const insertVendorIntoDb = catchAsync(async (req: Request, res: Response) => {
-  req.body.role = "vendor";
-  const result = await userServices.insertVendorIntoDb(req.body);
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "vendor created successfully",
+    message: "Userser created successfully",
     data: result,
   });
 });
@@ -97,7 +88,6 @@ const deleteAccount = catchAsync(async (req: Request, res: Response) => {
 
 export const userControllers = {
   insertuserIntoDb,
-  insertVendorIntoDb,
   getme,
   updateProfile,
   getAllUsers,
