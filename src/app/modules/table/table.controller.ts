@@ -5,11 +5,11 @@ import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 
 const insertTableIntoDb = catchAsync(async (req: Request, res: Response) => {
-  const result = await tableServices.insertTableIntoDB(req.body);
+  const result = await tableServices.insertTableIntoDb(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "table added successfully",
+    message: "Table added successfully",
     data: result,
   });
   return result;
@@ -19,19 +19,18 @@ const getAllTables = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "tables retrived successfully",
+    message: "Tables retrived successfully",
     data: result?.data,
     meta: result?.meta,
   });
   return result;
 });
-
 const getSingleTable = catchAsync(async (req: Request, res: Response) => {
   const result = await tableServices.getSingleTable(req.params.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "table retrived successfully",
+    message: "Table retrived successfully",
     data: result,
   });
   return result;
@@ -46,12 +45,13 @@ const updateTable = catchAsync(async (req: Request, res: Response) => {
   });
   return result;
 });
-const getVendorAllTables = catchAsync(async (req: Request, res: Response) => {
-  const result = await tableServices.getAllTablesForVendor(req?.user?.userId);
+
+const deleteTable = catchAsync(async (req: Request, res: Response) => {
+  const result = await tableServices.deleteTable(req.params.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Tables retrived successfully",
+    message: "Table deleted successfully",
     data: result,
   });
   return result;
@@ -62,5 +62,5 @@ export const tableControllers = {
   getAllTables,
   getSingleTable,
   updateTable,
-  getVendorAllTables,
+  deleteTable,
 };

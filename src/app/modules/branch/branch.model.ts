@@ -10,7 +10,11 @@ const branchSchema = new Schema<TBranch>(
       type: String,
       required: true,
     },
-
+    tables: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

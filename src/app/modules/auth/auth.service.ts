@@ -10,7 +10,9 @@ import { generateOtp } from "../../utils/otpGenerator";
 import moment from "moment";
 import { sendEmail } from "../../utils/mailSender";
 import bcrypt from "bcrypt";
-
+import path from "path";
+import fs from "fs";
+import handlebars from "handlebars";
 const login = async (payload: Tlogin) => {
   const user = await User.isUserExist(payload?.email);
   if (!user) {
@@ -22,9 +24,7 @@ const login = async (payload: Tlogin) => {
   if (user?.isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, "This user is deleted !");
   }
-  if (user?.status === "pending") {
-    throw new AppError(httpStatus.BAD_REQUEST, "user is not verified");
-  }
+
   if (!(await User.isPasswordMatched(payload.password, user.password))) {
     throw new AppError(httpStatus.BAD_REQUEST, "password do not match");
   }
@@ -43,6 +43,23 @@ const login = async (payload: Tlogin) => {
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string
   );
+  // const htmlPath = path.join(__dirname, "../../../../public2.html");
+  // fs.readFile(htmlPath, "utf8", async (err, htmlContent) => {
+  //   if (err) {
+  //     return console.error("Error reading the HTML file:", err);
+  //   }
+
+  //   const template = handlebars.compile(htmlContent);
+  //   const replacements = {
+  //     date: "2024-2023-11",
+  //   };
+  //   const htmlToSend = template(replacements);
+  //   // Define the email options
+
+  //   await sendEmail(payload?.email, "hello from udum", htmlToSend);
+  //   // Send the email
+  // });
+
   return {
     user,
     accessToken,
@@ -80,6 +97,7 @@ const changePassword = async (id: string, payload: TchangePassword) => {
     },
     { new: true }
   );
+
   return result;
 };
 // forgot password

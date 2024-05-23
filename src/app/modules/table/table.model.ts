@@ -1,30 +1,29 @@
-import { Schema, model } from "mongoose";
-import { TableModel, Ttable } from "./table.interface";
-const tableSchema = new Schema<Ttable, TableModel>(
+import mongoose, { Schema, model } from "mongoose";
+import { Ttable } from "./table.interface";
+const tableSchema = new Schema<Ttable>(
   {
-    tableNo: {
-      type: String,
-      required: [true, "table no is requried"],
-      // unique: true,
-    },
-    tableName: {
-      type: String,
-      default: "",
+    branch: {
+      type: mongoose.Types.ObjectId,
+      ref: "Branch",
+      required: true,
     },
     seats: {
-      type: String,
-      required: [true, "total seat is required"],
+      type: Number,
+      required: true,
     },
-    restaurant: {
-      type: Schema.Types.ObjectId,
-      ref: "Restaurant",
-      required: [true, "restaurant id is required"],
+    table1Capacity: {
+      type: Number,
+      default: 0,
+    },
+    table2Capacity: {
+      type: Number,
+      default: 0,
+    },
+    table3Capacity: {
+      type: Number,
+      default: 0,
     },
     isDeleted: {
-      type: Boolean,
-      default: false,
-    },
-    isBooked: {
       type: Boolean,
       default: false,
     },
@@ -52,4 +51,4 @@ tableSchema.pre("aggregate", function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
   next();
 });
-export const Table = model<Ttable, TableModel>("Table", tableSchema);
+export const Table = model<Ttable>("Table", tableSchema);

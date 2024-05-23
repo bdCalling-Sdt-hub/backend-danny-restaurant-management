@@ -3,22 +3,22 @@ import auth from "../../middleware/auth";
 import { USER_ROLE } from "../user/user.constant";
 import { tableControllers } from "./table.controller";
 const router = Router();
-router.post("/", auth(USER_ROLE.vendor), tableControllers.insertTableIntoDb);
-router.get(
-  "/owner",
-  auth(USER_ROLE.vendor),
-  tableControllers.getVendorAllTables
-);
-router.get(
+router.post(
   "/",
-  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
-  tableControllers.getAllTables
+  auth(USER_ROLE.sub_admin, USER_ROLE.super_admin),
+  tableControllers.insertTableIntoDb
 );
-router.get(
+router.get("/", tableControllers.getAllTables);
+router.get("/:id", tableControllers.getSingleTable);
+router.patch(
   "/:id",
-  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
-  tableControllers.getSingleTable
+  auth(USER_ROLE.sub_admin, USER_ROLE.super_admin),
+  tableControllers.updateTable
 );
-router.patch("/:id", auth(USER_ROLE.vendor), tableControllers.updateTable);
+router.delete(
+  "/:id",
+  auth(USER_ROLE.sub_admin, USER_ROLE.super_admin),
+  tableControllers.deleteTable
+);
 
 export const tableRoutes = router;
