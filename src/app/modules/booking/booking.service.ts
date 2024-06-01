@@ -1,5 +1,6 @@
 import httpStatus from "http-status";
 import moment from "moment";
+import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
 import { Branch } from "../branch/branch.model";
 import { Table } from "../table/table.model";
@@ -7,6 +8,7 @@ import { Booking } from "./booking.model";
 import { bookingUtils } from "./booking.utils";
 
 const insertBookingIntoDB = async (payload: TBooking) => {
+  console.log(payload);
   // find branch
   const findBranch: any = await Branch.findById(payload.branch);
   if (!findBranch) {
@@ -78,6 +80,38 @@ const insertBookingIntoDB = async (payload: TBooking) => {
   return result;
 };
 
+// getallBooking
+
+const findAllBooking = async (query: Record<string, any>) => {
+  const bookingModel = new QueryBuilder(Booking.find(), query)
+    .search([])
+    .filter()
+    .paginate()
+    .sort()
+    .fields();
+
+  const result = await bookingModel.modelQuery;
+  const meta = await bookingModel.countTotal();
+
+  return {
+    result,
+    meta,
+  };
+};
+
+const getSingleBooking = async (id: string) => {
+  const result = await Booking.findById(id);
+  return result;
+};
+
+const updateBooking = async (id: string, payload: Partial<TBooking>) => {
+  const result = await Booking.findByIdAndUpdate(id, payload);
+  return result;
+};
+
 export const bookingServices = {
   insertBookingIntoDB,
+  findAllBooking,
+  getSingleBooking,
+  updateBooking,
 };

@@ -8,11 +8,41 @@ const insertBookingIntoDB = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Booking inserted successfully.",
+    message: "Reservation inserted successfully.",
+    data: result,
+  });
+});
+const getAllBooking = catchAsync(async (req: Request, res: Response) => {
+  const result = await bookingServices.findAllBooking(req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reservations retrived successfully",
+    data: result,
+  });
+});
+const getSingleBooking = catchAsync(async (req: Request, res: Response) => {
+  const result = await bookingServices.getSingleBooking(req.params.id);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reservation retrived successfully",
+    data: result,
+  });
+});
+const updateBooking = catchAsync(async (req: Request, res: Response) => {
+  const result = await bookingServices.updateBooking(req.params.id, req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reservation updated successfully",
     data: result,
   });
 });
 
 export const bookingControllers = {
   insertBookingIntoDB,
+  getSingleBooking,
+  getAllBooking,
+  updateBooking,
 };

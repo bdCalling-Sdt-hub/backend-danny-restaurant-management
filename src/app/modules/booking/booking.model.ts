@@ -12,7 +12,6 @@ const bookingSchema = new Schema<TBooking>(
     },
     number: {
       type: Number,
-      max: 11,
     },
     branch: {
       type: mongoose.Types.ObjectId,
