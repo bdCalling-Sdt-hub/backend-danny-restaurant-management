@@ -11,6 +11,10 @@ const tableSchema = new Schema<Ttable>(
       type: Number,
       required: true,
     },
+    total: {
+      type: Number,
+      required: true,
+    },
     table1Capacity: {
       type: Number,
       default: 0,

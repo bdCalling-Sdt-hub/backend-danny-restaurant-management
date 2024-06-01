@@ -1,9 +1,53 @@
-export const generateBookingNumber = () => {
-  // Get the current timestamp
-  const timestamp = Date.now();
-  // Use the last 6 digits of the timestamp
-  const seed = timestamp % 1000000;
-  // Use the seed to generate a random number
-  const randomNumber = Math.floor(seed + Math.random() * (999999 - seed));
-  return randomNumber;
+import moment from "moment";
+import { Booking } from "./booking.model";
+
+const calculateExpires = (arrivalTime: string, limit: number) => {
+  return moment(arrivalTime, "HH:mm")
+    .add(limit, "hours")
+    .subtract(1, "minute")
+    .format("HH:mm");
+};
+
+const isTableAvailable = async (
+  arrivalTime: string,
+  expiryTime: string,
+  date: string,
+  branch: string,
+  seats: number
+) => {
+  const booking = await Booking.findOne({
+    date,
+    seats,
+    branch,
+    $or: [
+      { arrivalTime: { $lt: expiryTime }, expiryTime: { $gt: arrivalTime } },
+      { arrivalTime: { $gte: arrivalTime, $lte: expiryTime } },
+    ],
+  });
+  console.log("booking", booking);
+  return !booking;
+};
+
+const isTimeWithinRange = (
+  time: string,
+  startTime: string,
+  endTime: string
+) => {
+  const arrivalTime = moment(time, "HH:mm");
+  const start = moment(startTime, "HH:mm");
+  const end = moment(endTime, "HH:mm");
+  console.log(arrivalTime, start, end);
+  return arrivalTime.isBetween(start, end, null, "[]");
+};
+
+const generateBookingID = (): string => {
+  const randomNumber = Math.floor(10000000 + Math.random() * 90000000);
+  return `${randomNumber}${Date.now()}`.slice(0, 8);
+};
+
+export const bookingUtils = {
+  calculateExpires,
+  isTableAvailable,
+  isTimeWithinRange,
+  generateBookingID,
 };

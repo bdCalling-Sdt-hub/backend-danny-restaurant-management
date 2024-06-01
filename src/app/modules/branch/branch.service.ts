@@ -1,9 +1,8 @@
-import httpStatus from "http-status";
-import AppError from "../../error/AppError";
 import { TBranch } from "./branch.interface";
 import { Branch } from "./branch.model";
 
 const insertBranchIntoDB = async (payload: TBranch) => {
+  console.log(payload);
   const result = await Branch.create(payload);
   return result;
 };

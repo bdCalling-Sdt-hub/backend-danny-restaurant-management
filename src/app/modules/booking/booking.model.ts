@@ -1,44 +1,69 @@
-import { model, Schema } from "mongoose";
-import { TBooking } from "./booking.interface";
+import mongoose, { Schema, model } from "mongoose";
 
 const bookingSchema = new Schema<TBooking>(
   {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "user information is required"],
-    },
-    id: {
+    name: {
       type: String,
-      required: [true, "id is required"],
+      required: true,
     },
-    restaurant: {
-      type: Schema.Types.ObjectId,
-      ref: "Restaurant",
-      required: [true, "table id is required"],
+    email: {
+      type: String,
+      required: true,
     },
-    table: {
-      type: Schema.Types.ObjectId,
-      ref: "Table",
-      required: [true, "table id is required"],
+    number: {
+      type: Number,
+      max: 11,
+    },
+    branch: {
+      type: mongoose.Types.ObjectId,
+      ref: "Branch",
+      required: true,
+    },
+    seats: {
+      type: Number,
+      required: true,
     },
     date: {
       type: String,
-      required: [true, "date is required"],
+      required: true,
     },
-    time: {
+    arrivalTime: {
       type: String,
-      required: [true, "time is required"],
+      required: true,
     },
-    status: {
+    expiryTime: {
       type: String,
-      enum: ["active", "cancelled", "closed"],
-      default: "active",
+      required: true,
+    },
+    bookingId: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {
     timestamps: true,
   }
 );
+
+// filter out deleted documents
+bookingSchema.pre("find", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+bookingSchema.pre("findOne", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+bookingSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
+});
 
 export const Booking = model<TBooking>("Booking", bookingSchema);
