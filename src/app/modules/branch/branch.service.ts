@@ -150,9 +150,14 @@ const updateBranch = async (id: string, payload: Partial<TBranch>) => {
   return result;
 };
 
+const getSingleBranch = async (id: string) => {
+  const result = await Branch.findById(id);
+  return result;
+};
 export const branchservices = {
   insertBranchIntoDB,
   getAllBranch,
   getOpenandCloseTime,
   updateBranch,
+  getSingleBranch,
 };

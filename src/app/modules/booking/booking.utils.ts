@@ -2,8 +2,9 @@ import moment from "moment";
 import { Booking } from "./booking.model";
 
 const calculateExpires = (arrivalTime: string, limit: number) => {
+  console.log(arrivalTime, limit);
   return moment(arrivalTime, "HH:mm")
-    .add(limit, "hours")
+    .add(limit, "minutes") // Change "hours" to "minutes"
     .subtract(1, "minute")
     .format("HH:mm");
 };
@@ -24,7 +25,6 @@ const isTableAvailable = async (
       { arrivalTime: { $gte: arrivalTime, $lte: expiryTime } },
     ],
   });
-  console.log("booking", booking);
   return !booking;
 };
 
@@ -36,7 +36,6 @@ const isTimeWithinRange = (
   const arrivalTime = moment(time, "HH:mm");
   const start = moment(startTime, "HH:mm");
   const end = moment(endTime, "HH:mm");
-  console.log(arrivalTime, start, end);
   return arrivalTime.isBetween(start, end, null, "[]");
 };
 

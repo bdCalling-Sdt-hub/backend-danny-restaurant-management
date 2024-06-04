@@ -1,4 +1,6 @@
 import mongoose, { Schema, model } from "mongoose";
+import { BStatus } from "./booking.constant";
+import { TBooking } from "./booking.interface";
 
 const bookingSchema = new Schema<TBooking>(
   {
@@ -12,6 +14,10 @@ const bookingSchema = new Schema<TBooking>(
     },
     number: {
       type: Number,
+    },
+    table: {
+      type: mongoose.Types.ObjectId,
+      ref: "Table",
     },
     branch: {
       type: mongoose.Types.ObjectId,
@@ -37,6 +43,12 @@ const bookingSchema = new Schema<TBooking>(
     bookingId: {
       type: String,
       unique: true,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: Object.values(BStatus),
+      default: "onGoing",
       required: true,
     },
     isDeleted: {

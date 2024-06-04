@@ -22,43 +22,85 @@ const branchSchema = new Schema<TBranch>(
       default: 0,
     },
     sunday: {
-      openTime: String,
-      closeTime: String,
+      openTime: {
+        type: String,
+        default: "09:00",
+      },
+      closeTime: {
+        type: String,
+        default: "20:00",
+      },
       isClosed: Boolean,
     },
     monday: {
-      openTime: String,
-      closeTime: String,
+      openTime: {
+        type: String,
+        default: "09:00",
+      },
+      closeTime: {
+        type: String,
+        default: "20:00",
+      },
       isClosed: Boolean,
     },
     tuesday: {
-      openTime: String,
-      closeTime: String,
+      openTime: {
+        type: String,
+        default: "09:00",
+      },
+      closeTime: {
+        type: String,
+        default: "20:00",
+      },
       isClosed: Boolean,
     },
     wednesday: {
-      openTime: String,
-      closeTime: String,
+      openTime: {
+        type: String,
+        default: "09:00",
+      },
+      closeTime: {
+        type: String,
+        default: "20:00",
+      },
       isClosed: Boolean,
     },
     thursday: {
-      openTime: String,
-      closeTime: String,
+      openTime: {
+        type: String,
+        default: "09:00",
+      },
+      closeTime: {
+        type: String,
+        default: "20:00",
+      },
       isClosed: Boolean,
     },
     friday: {
-      openTime: String,
-      closeTime: String,
+      openTime: {
+        type: String,
+        default: "09:00",
+      },
+      closeTime: {
+        type: String,
+        default: "20:00",
+      },
       isClosed: Boolean,
     },
     saturday: {
-      openTime: String,
-      closeTime: String,
+      openTime: {
+        type: String,
+        default: "09:00",
+      },
+      closeTime: {
+        type: String,
+        default: "20:00",
+      },
       isClosed: Boolean,
     },
     endTimeLimit: {
       type: Number,
-      default: 2,
+      default: 120,
     },
     isDeleted: {
       type: Boolean,

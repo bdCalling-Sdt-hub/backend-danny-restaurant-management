@@ -4,11 +4,11 @@ import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
 import { Branch } from "../branch/branch.model";
 import { Table } from "../table/table.model";
+import { TBooking } from "./booking.interface";
 import { Booking } from "./booking.model";
 import { bookingUtils } from "./booking.utils";
 
 const insertBookingIntoDB = async (payload: TBooking) => {
-  console.log(payload);
   // find branch
   const findBranch: any = await Branch.findById(payload.branch);
   if (!findBranch) {
@@ -29,7 +29,6 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     findBranch[day].openTime,
     findBranch[day].closeTime
   );
-
   if (!isWithinBranchHours) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
@@ -42,14 +41,13 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     payload?.arrivalTime,
     findBranch?.endTimeLimit
   );
-
   //   check avaiable tables
-  const totalTables = await Table.findOne({
+  const findTables = await Table.findOne({
     branch: payload.branch,
     seats: payload.seats,
   });
 
-  if (!totalTables) {
+  if (!findTables) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       "No tables found for this number of seats"
@@ -65,7 +63,7 @@ const insertBookingIntoDB = async (payload: TBooking) => {
   });
 
   //   check is any tables availble for this momemt
-  if (totalBookings >= totalTables?.total) {
+  if (totalBookings >= findTables?.total) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
       "No tables available for this time slot. Please try again later or choose a different time."
@@ -75,6 +73,7 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     ...payload,
     expiryTime: expireHours,
     bookingId: bookingUtils.generateBookingID(),
+    table: findTables?._id,
   };
   const result = await Booking.create(data);
   return result;
@@ -90,11 +89,11 @@ const findAllBooking = async (query: Record<string, any>) => {
     .sort()
     .fields();
 
-  const result = await bookingModel.modelQuery;
+  const data = await bookingModel.modelQuery;
   const meta = await bookingModel.countTotal();
 
   return {
-    result,
+    data,
     meta,
   };
 };
@@ -109,9 +108,59 @@ const updateBooking = async (id: string, payload: Partial<TBooking>) => {
   return result;
 };
 
+// all branches booking
+
+const allBranchesBooking = async () => {
+  const result = await Booking.aggregate([
+    {
+      $lookup: {
+        from: "branches",
+        localField: "branch",
+        foreignField: "_id",
+        pipeline: [{ $project: { name: 1 } }],
+        as: "branch",
+      },
+    },
+    {
+      $lookup: {
+        from: "tables",
+        localField: "table",
+        foreignField: "_id",
+        pipeline: [
+          {
+            $project: {
+              table1Capacity: 1,
+              table2Capacity: 1,
+              table3Capacity: 1,
+            },
+          },
+        ],
+        as: "table",
+      },
+    },
+    {
+      $project: {
+        status: 1,
+        name: 1,
+        email: 1,
+        branch: { $arrayElemAt: ["$branch.name", 0] },
+        seats: 1,
+        date: 1,
+        time: "$arrivalTime",
+        bookingId: 1,
+        table1Capacity: { $arrayElemAt: ["$table.table1Capacity", 0] },
+        table2Capacity: { $arrayElemAt: ["$table.table2Capacity", 0] },
+        table3Capacity: { $arrayElemAt: ["$table.table3Capacity", 0] },
+      },
+    },
+  ]);
+  return result;
+};
+
 export const bookingServices = {
   insertBookingIntoDB,
   findAllBooking,
   getSingleBooking,
   updateBooking,
+  allBranchesBooking,
 };

@@ -30,6 +30,15 @@ const getOpenAndCloseTime = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getSingleBranch = catchAsync(async (req: Request, res: Response) => {
+  const result = await branchservices.getSingleBranch(req.params.id);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Branch retrived successfully.",
+    data: result,
+  });
+});
 const updateBranch = catchAsync(async (req: Request, res: Response) => {
   const result = await branchservices.updateBranch(req.params.id, req.body);
   sendResponse(res, {
@@ -45,4 +54,5 @@ export const branchControllers = {
   getAllBranch,
   getOpenAndCloseTime,
   updateBranch,
+  getSingleBranch,
 };

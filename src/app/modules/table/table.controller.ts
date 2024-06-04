@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
-import { tableServices } from "./table.service";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { tableServices } from "./table.service";
 
 const insertTableIntoDb = catchAsync(async (req: Request, res: Response) => {
   const result = await tableServices.insertTableIntoDb(req.body);

@@ -18,7 +18,8 @@ const getAllBooking = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: "Reservations retrived successfully",
-    data: result,
+    data: result?.data,
+    meta: result?.meta,
   });
 });
 const getSingleBooking = catchAsync(async (req: Request, res: Response) => {
@@ -39,10 +40,22 @@ const updateBooking = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const findAllReservationBybranch = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await bookingServices.allBranchesBooking();
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Reservations retrived successfully",
+      data: result,
+    });
+  }
+);
 
 export const bookingControllers = {
   insertBookingIntoDB,
   getSingleBooking,
   getAllBooking,
   updateBooking,
+  findAllReservationBybranch,
 };
