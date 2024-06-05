@@ -4,3 +4,11 @@ export enum BStatus {
   canCencelled = "canCencelled",
   rejected = "rejected",
 }
+
+export const BookingfilterableFileds = [
+  "arrivalTime",
+  "expiryTime",
+  "date",
+  "branch",
+];
+export const BookingsearchableFields = ["bookingId", "email", "name"];

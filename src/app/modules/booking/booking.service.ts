@@ -1,9 +1,11 @@
 import httpStatus from "http-status";
 import moment from "moment";
+import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
 import { Branch } from "../branch/branch.model";
 import { Table } from "../table/table.model";
+import { BookingsearchableFields } from "./booking.constant";
 import { TBooking } from "./booking.interface";
 import { Booking } from "./booking.model";
 import { bookingUtils } from "./booking.utils";
@@ -110,8 +112,42 @@ const updateBooking = async (id: string, payload: Partial<TBooking>) => {
 
 // all branches booking
 
-const allBranchesBooking = async () => {
-  const result = await Booking.aggregate([
+const allBranchesBooking = async (filters: Record<string, any>) => {
+  const { searchTerm, ...filtersData } = filters;
+  const pipeline = [];
+  // Search term filtering
+  if (searchTerm) {
+    pipeline.push({
+      $match: {
+        $or: BookingsearchableFields.map((field) => ({
+          [field]: {
+            $regex: searchTerm,
+            $options: "i",
+          },
+        })),
+      },
+    });
+  }
+
+  // Combine branch and other filters
+  const matchCondition: any = {};
+  if (filtersData?.arrivalTime || filtersData?.expiryTime) {
+    matchCondition.arrivalTime = { $lte: filtersData.expiryTime };
+    matchCondition.expiryTime = { $gte: filtersData.arrivalTime };
+  }
+
+  if (filtersData.branch) {
+    matchCondition.branch = new mongoose.Types.ObjectId(filtersData.branch);
+  }
+  // Merge matchCondition with filtersData
+  const mergedFilters: any = { ...filtersData, ...matchCondition };
+  if (Object.keys(mergedFilters).length > 0) {
+    pipeline.push({
+      $match: mergedFilters,
+    });
+  }
+  // Lookup branches and tables
+  pipeline.push(
     {
       $lookup: {
         from: "branches",
@@ -152,8 +188,10 @@ const allBranchesBooking = async () => {
         table2Capacity: { $arrayElemAt: ["$table.table2Capacity", 0] },
         table3Capacity: { $arrayElemAt: ["$table.table3Capacity", 0] },
       },
-    },
-  ]);
+    }
+  );
+
+  const result = await Booking.aggregate(pipeline);
   return result;
 };
 

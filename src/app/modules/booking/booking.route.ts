@@ -7,7 +7,7 @@ const router = Router();
 router.post("/", bookingControllers.insertBookingIntoDB);
 router.get(
   "/all",
-  auth(USER_ROLE.super_admin),
+  auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
   bookingControllers.findAllReservationBybranch
 );
 router.get(

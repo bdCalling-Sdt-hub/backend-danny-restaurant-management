@@ -42,7 +42,7 @@ const updateBooking = catchAsync(async (req: Request, res: Response) => {
 });
 const findAllReservationBybranch = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await bookingServices.allBranchesBooking();
+    const result = await bookingServices.allBranchesBooking(req.query);
     sendResponse(res, {
       statusCode: 200,
       success: true,
