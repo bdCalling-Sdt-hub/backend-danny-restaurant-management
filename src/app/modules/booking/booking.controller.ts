@@ -51,6 +51,15 @@ const findAllReservationBybranch = catchAsync(
     });
   }
 );
+const deleteBooking = catchAsync(async (req: Request, res: Response) => {
+  const result = await bookingServices.deleteBooking(req.params.id);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reservation deleted successfully",
+    data: result,
+  });
+});
 
 export const bookingControllers = {
   insertBookingIntoDB,
@@ -58,4 +67,5 @@ export const bookingControllers = {
   getAllBooking,
   updateBooking,
   findAllReservationBybranch,
+  deleteBooking,
 };

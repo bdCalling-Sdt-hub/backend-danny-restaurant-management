@@ -1,17 +1,15 @@
 import httpStatus from "http-status";
-import jwt, { Secret } from "jsonwebtoken";
-import { JwtPayload } from "jsonwebtoken";
-import catchAsync from "../utils/catchAsync";
-import AppError from "../error/AppError";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config/index";
+import AppError from "../error/AppError";
 import { User } from "../modules/user/user.model";
+import catchAsync from "../utils/catchAsync";
 
 const auth = (...userRoles: string[]) => {
   return catchAsync(async (req, res, next) => {
     const token = req?.headers?.authorization?.split(" ")[1];
 
     if (!token) {
-      console.log("error from here", token);
       throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized!");
     }
     let decode;

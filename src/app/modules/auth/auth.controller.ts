@@ -1,24 +1,18 @@
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import { authServices } from "./auth.service";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import config from "../../config";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { authServices } from "./auth.service";
 const login = catchAsync(async (req: Request, res: Response) => {
   const result = await authServices.login(req.body);
   const { refreshToken } = result;
-  const cookieOptions = {
-    secure: false,
+  res.cookie("refreshToken", refreshToken, {
+    secure: config.NODE_ENV === "production",
     httpOnly: true,
-    // maxAge: parseInt(config.jwt.refresh_expires_in || '31536000000'),
-    maxAge: 31536000000,
-  };
-
-  if (config.NODE_ENV === "production") {
-    //@ts-ignore
-    cookieOptions.sameSite = "none";
-  }
-  res.cookie("refreshToken", refreshToken, cookieOptions);
+    sameSite: "none",
+    maxAge: 1000 * 60 * 60 * 24 * 365,
+  });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

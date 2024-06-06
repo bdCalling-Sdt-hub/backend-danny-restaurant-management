@@ -195,10 +195,15 @@ const allBranchesBooking = async (filters: Record<string, any>) => {
   return result;
 };
 
+const deleteBooking = async (id: string) => {
+  const result = await Booking.findByIdAndDelete(id);
+  return result;
+};
 export const bookingServices = {
   insertBookingIntoDB,
   findAllBooking,
   getSingleBooking,
   updateBooking,
   allBranchesBooking,
+  deleteBooking,
 };

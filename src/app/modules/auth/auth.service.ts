@@ -1,18 +1,15 @@
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 
+import bcrypt from "bcrypt";
 import httpStatus from "http-status";
+import moment from "moment";
+import config from "../../config";
 import AppError from "../../error/AppError";
+import { sendEmail } from "../../utils/mailSender";
+import { generateOtp } from "../../utils/otpGenerator";
 import { User } from "../user/user.model";
 import { TchangePassword, Tlogin, TresetPassword } from "./auth.interface";
-import config from "../../config";
 import { createToken, verifyToken } from "./auth.utils";
-import { generateOtp } from "../../utils/otpGenerator";
-import moment from "moment";
-import { sendEmail } from "../../utils/mailSender";
-import bcrypt from "bcrypt";
-import path from "path";
-import fs from "fs";
-import handlebars from "handlebars";
 const login = async (payload: Tlogin) => {
   const user = await User.isUserExist(payload?.email);
   if (!user) {
@@ -30,7 +27,8 @@ const login = async (payload: Tlogin) => {
   }
   const jwtPayload = {
     userId: user?._id,
-    role: user.role,
+    role: user?.role,
+    branch: user?.branch,
   };
   const accessToken = createToken(
     jwtPayload,
