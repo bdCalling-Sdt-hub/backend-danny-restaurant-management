@@ -1,7 +1,7 @@
-import catchAsync from "../../utils/catchAsync";
 import { Request, Response } from "express";
-import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 import { notificationServices } from "./notificaiton.service";
 const insertNotificatonIntoDb = catchAsync(
   async (req: Request, res: Response) => {
@@ -17,9 +17,7 @@ const insertNotificatonIntoDb = catchAsync(
   }
 );
 const getAllNotification = catchAsync(async (req: Request, res: Response) => {
-  const query = { ...req.query };
-  query["receiver"] = req?.user?.userId;
-  const result = await notificationServices.getAllNotifications(query);
+  const result = await notificationServices.getAllNotifications(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -28,6 +26,21 @@ const getAllNotification = catchAsync(async (req: Request, res: Response) => {
     meta: result?.meta,
   });
 });
+const getAllNotificationFromDb = catchAsync(
+  async (req: Request, res: Response) => {
+    console.log(req.query, "cc");
+    const result = await notificationServices.getAllNotficationsFromDb(
+      req.query
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Notifications retrived successfully",
+      data: result?.data,
+      meta: result?.meta,
+    });
+  }
+);
 const markAsDone = catchAsync(async (req: Request, res: Response) => {
   const result = await notificationServices.markAsDone(req?.user?.userId);
   sendResponse(res, {
@@ -40,6 +53,7 @@ const markAsDone = catchAsync(async (req: Request, res: Response) => {
 
 export const notificationControllers = {
   insertNotificatonIntoDb,
+  getAllNotificationFromDb,
   getAllNotification,
   markAsDone,
 };

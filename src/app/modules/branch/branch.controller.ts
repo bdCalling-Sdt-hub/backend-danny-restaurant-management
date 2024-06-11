@@ -3,6 +3,8 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { branchservices } from "./branch.service";
 const insertBranchIntoDb = catchAsync(async (req: Request, res: Response) => {
+  const data = { ...req.body };
+  data["owner"] = req?.user?.userId;
   const result = await branchservices.insertBranchIntoDB(req.body);
   sendResponse(res, {
     statusCode: 200,

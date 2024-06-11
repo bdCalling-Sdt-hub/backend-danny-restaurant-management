@@ -1,22 +1,87 @@
-import { FilterQuery } from "mongoose";
-import { emitMessage } from "../../utils/socket";
-import { TNotification } from "./notification.interface";
-import { Notification } from "./notification.model";
 import QueryBuilder from "../../builder/QueryBuilder";
-import { notification } from "antd";
-import moment from "moment";
+import { emitMessage } from "../../utils/socket";
+import { Notification } from "./notification.model";
 
 const insertNotificationIntoDb = async (payload: any) => {
-  console.log(payload);
-  const result = await Notification.insertMany(payload);
+  const result = await Notification.create(payload);
   // @ts-ignore
-  payload?.forEach((element) => {
-    emitMessage(element?.receiver, {
-      ...element,
-      createdAt: moment().format("YYYY-MM-DD"),
-    });
-  });
+  emitMessage("notification", payload?.message);
   return result;
+};
+
+const getAllNotficationsFromDb = async (query: Record<string, any>) => {
+  const { page = 1, limit = 10 } = query;
+  const skip = (page - 1) * limit;
+  const totalCount = await Notification.countDocuments();
+  const result = await Notification.aggregate([
+    {
+      $lookup: {
+        from: "bookings",
+        let: { bookingId: "$refference" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$bookingId"] },
+            },
+          },
+          {
+            $project: {
+              branch: 1,
+              arrivalTime: 1,
+              name: 1,
+              date: 1,
+              seats: 1,
+              bookingId: 1,
+            },
+          },
+        ],
+        as: "booking",
+      },
+    },
+    { $unwind: "$booking" },
+    {
+      $lookup: {
+        from: "branches",
+        let: { branchId: "$booking.branch" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$branchId"] },
+            },
+          },
+          {
+            $project: {
+              name: 1,
+            },
+          },
+        ],
+        as: "branch",
+      },
+    },
+    { $unwind: "$branch" },
+    {
+      $project: {
+        customer: "$booking.name",
+        seats: "$booking.seats",
+        arrivalDate: "$booking.date",
+        branch: "$branch.name",
+        arrivalTime: "$booking.arrivalTime",
+        isDeleted: 1,
+        read: 1,
+        message: 1,
+      },
+    },
+    { $skip: skip },
+    { $limit: limit },
+  ]);
+
+  const meta = {
+    total: result?.length,
+    page: page,
+    limit: limit,
+    totalPage: totalCount,
+  };
+  return { data: result, meta };
 };
 
 const getAllNotifications = async (query: Record<string, any>) => {
@@ -51,5 +116,6 @@ const markAsDone = async (id: string) => {
 export const notificationServices = {
   insertNotificationIntoDb,
   getAllNotifications,
+  getAllNotficationsFromDb,
   markAsDone,
 };

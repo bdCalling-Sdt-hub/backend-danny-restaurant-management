@@ -7,12 +7,17 @@ const router = Router();
 // router.post("/",)
 router.get(
   "/",
-  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
-  notificationControllers.getAllNotification
+  auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
+  notificationControllers.getAllNotificationFromDb
 );
+// router.get(
+//   "/",
+//   auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
+//   notificationControllers.getAllNotification
+// );
 router.patch(
   "/",
-  auth(USER_ROLE.vendor, USER_ROLE.admin, USER_ROLE.user),
+  auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
   notificationControllers.markAsDone
 );
 

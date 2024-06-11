@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import { daysOfWeek } from "./branch.constant";
 import { TBranch } from "./branch.interface";
 const branchSchema = new Schema<TBranch>(
@@ -14,6 +14,11 @@ const branchSchema = new Schema<TBranch>(
     daysOfWeek: {
       type: String,
       enum: Object.values(daysOfWeek),
+      required: true,
+    },
+    owner: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     tables: {

@@ -1,3 +1,4 @@
+import { ObjectId } from "mongoose";
 import { daysOfWeek } from "./branch.constant";
 
 interface OpeningAndClosingTime {
@@ -9,6 +10,7 @@ export interface TBranch {
   name: string;
   location: string;
   isDeleted: boolean;
+  owner: ObjectId;
   tables: number;
   endTimeLimit: number;
   daysOfWeek: daysOfWeek;

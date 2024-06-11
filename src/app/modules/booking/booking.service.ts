@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
 import { Branch } from "../branch/branch.model";
+import { notificationServices } from "../notification/notificaiton.service";
 import { Table } from "../table/table.model";
 import { BookingsearchableFields } from "./booking.constant";
 import { TBooking } from "./booking.interface";
@@ -78,12 +79,18 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     table: findTables?._id,
   };
   const result = await Booking.create(data);
+
+  const notificatonData = {
+    message: `${payload?.name} booked a table`,
+    refference: result?._id,
+  };
+  await notificationServices.insertNotificationIntoDb(notificatonData);
   return result;
 };
 
 // getallBooking
 
-const findAllBooking = async (query: Record<string, any>) => {
+const findAllBooking = async (query: Record<string, any>, userId: string) => {
   const bookingModel = new QueryBuilder(Booking.find(), query)
     .search([])
     .filter()

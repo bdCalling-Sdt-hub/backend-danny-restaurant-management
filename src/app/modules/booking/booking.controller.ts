@@ -13,7 +13,10 @@ const insertBookingIntoDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getAllBooking = catchAsync(async (req: Request, res: Response) => {
-  const result = await bookingServices.findAllBooking(req.query);
+  const result = await bookingServices.findAllBooking(
+    req.query,
+    req?.user?.userId
+  );
   sendResponse(res, {
     statusCode: 200,
     success: true,
