@@ -131,9 +131,16 @@ const forgotPassword = async (email: string) => {
   await sendEmail(
     email,
     "your reset password otp is:",
-    `<div><h5>your otp is: ${otp}</h5>
-    <p>valid for:${expiresAt.toLocaleString()}</p>
-    </div>`
+    `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+    <h2 style="color: #70B228; text-align: center;">Your One Time OTP</h2>
+    <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <p style="font-size: 18px; color: #013B23; text-align: center; margin-bottom: 20px;">Your OTP Is:</p>
+        <p style="font-size: 24px; color: #70B228; text-align: center; font-weight: bold; margin: 10px 0;">${otp}</p>
+        <p style="font-size: 14px; color: #666; text-align: center;">This OTP is valid until:</p>
+        <p style="font-size: 14px; color: #013B23; text-align: center; font-weight: bold;">${expiresAt.toLocaleString()}</p>
+    </div>
+</div>
+`
   );
   // send the mail here
   return { email, token };
