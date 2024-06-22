@@ -217,6 +217,17 @@ const deleteBooking = async (id: string) => {
   const result = await Booking.findByIdAndDelete(id);
   return result;
 };
+
+const closeBooking = async () => {
+  const result = await Booking.updateMany({
+    date: { $lt: moment().format("YYYY-MM-DD") },
+    $set: {
+      status: "closed",
+    },
+  });
+  return result;
+};
+
 export const bookingServices = {
   insertBookingIntoDB,
   findAllBooking,
@@ -224,4 +235,5 @@ export const bookingServices = {
   updateBooking,
   allBranchesBooking,
   deleteBooking,
+  closeBooking,
 };
