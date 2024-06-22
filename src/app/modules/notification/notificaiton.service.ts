@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { emitMessage } from "../../utils/socket";
 import { Notification } from "./notification.model";
@@ -86,10 +87,13 @@ const insertNotificationIntoDb = async (payload: any) => {
 
 const getAllNotficationsFromDb = async (query: Record<string, any>) => {
   const { page = 1, limit = 10, branch: branchId } = query;
+  console.log(query);
   const skip = (page - 1) * limit;
 
   // Build the match stage for the specific branch if provided
-  const branchMatchStage = branchId ? { "booking.branch": branchId } : {};
+  const branchMatchStage = branchId
+    ? { "booking.branch": new mongoose.Types.ObjectId(branchId.toString()) }
+    : {};
 
   const totalCount = await Notification.countDocuments(branchMatchStage);
   const result = await Notification.aggregate([

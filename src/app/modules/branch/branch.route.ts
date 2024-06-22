@@ -11,7 +11,11 @@ router.post(
   auth(USER_ROLE.super_admin),
   branchControllers.insertBranchIntoDb
 );
-router.get("/", auth(USER_ROLE.super_admin), branchControllers.getAllBranch);
+router.get(
+  "/",
+  auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
+  branchControllers.getAllBranch
+);
 router.get("/:id", branchControllers.getSingleBranch);
 router.get("/openTime-closeTime/:id", branchControllers.getOpenAndCloseTime);
 
