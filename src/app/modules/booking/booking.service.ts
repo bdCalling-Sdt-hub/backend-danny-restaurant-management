@@ -1,8 +1,12 @@
+import fs from "fs";
+import handlebars from "handlebars";
 import httpStatus from "http-status";
 import moment from "moment";
 import mongoose from "mongoose";
+import path from "path";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
+import { sendEmail } from "../../utils/mailSender";
 import { Branch } from "../branch/branch.model";
 import { notificationServices } from "../notification/notificaiton.service";
 import { Table } from "../table/table.model";
@@ -94,6 +98,32 @@ const insertBookingIntoDB = async (payload: TBooking) => {
   await notificationServices.insertNotificationIntoDb({
     message: `${payload?.name} booked a table`,
     refference: result?._id,
+  });
+
+  // sending email
+  const templatePath = path.resolve(__dirname, "../../../../public.html");
+  fs.readFile(templatePath, "utf8", async (err, htmlContent) => {
+    if (err) {
+      console.error("Error reading the HTML file:", err);
+    }
+    const template = handlebars.compile(htmlContent);
+    const emailContext = {
+      name: payload?.name,
+      email: payload?.email,
+      date: payload?.date,
+      seats: payload?.seats,
+      arrivalTime: payload?.arrivalTime,
+      expiryTime: payload?.expiryTime,
+    };
+    const htmlToSend = template(emailContext);
+    // Define the email options
+
+    await sendEmail(
+      payload?.email,
+      "Your Reservation was successfull",
+      htmlToSend
+    );
+    // Send the email
   });
 
   return result;
