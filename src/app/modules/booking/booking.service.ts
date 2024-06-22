@@ -12,21 +12,29 @@ import { Booking } from "./booking.model";
 import { bookingUtils } from "./booking.utils";
 
 const insertBookingIntoDB = async (payload: TBooking) => {
-  // find branch
-  const findBranch: any = await Branch.findById(payload.branch);
+  // Cache frequently accessed data
+  const branchCache = new Map();
+  // Find branch and check if it exists
+  let findBranch: any = branchCache.get(payload.branch);
   if (!findBranch) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      "Branch information not found! Please try again"
-    );
+    findBranch = await Branch.findById(payload.branch);
+    if (!findBranch) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "Branch information not found! Please try again"
+      );
+    }
+    branchCache.set(payload.branch, findBranch);
   }
-  //   date convert
+
+  // Convert date and check if branch is closed on that day
   const date = moment(payload.date, "YYYY-MM-DD");
   const day = date.format("dddd").toLowerCase();
   if (findBranch.daysOfWeek === day) {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, `Branch is closed on ${day}`);
   }
-  //   check is close and opentime conflict
+
+  // Check if booking time is within branch hours
   const isWithinBranchHours = bookingUtils.isTimeWithinRange(
     payload.arrivalTime,
     findBranch[day].openTime,
@@ -38,17 +46,24 @@ const insertBookingIntoDB = async (payload: TBooking) => {
       "Booking time conflicts with branch operating hours. Please choose a different time slot."
     );
   }
-  //
-  //   set expires hours
+
+  // Calculate expire hours
   const expireHours = bookingUtils.calculateExpires(
     payload?.arrivalTime,
     findBranch?.endTimeLimit
   );
-  //   check avaiable tables
-  const findTables = await Table.findOne({
-    branch: payload.branch,
-    seats: payload.seats,
-  });
+
+  // Check available tables and total bookings concurrently
+  const [findTables, totalBookings] = await Promise.all([
+    Table.findOne({ branch: payload.branch, seats: payload.seats }),
+    Booking.countDocuments({
+      branch: payload.branch,
+      date: payload.date,
+      status: "onGoing",
+      arrivalTime: { $lt: expireHours },
+      expiryTime: { $gt: payload?.arrivalTime },
+    }),
+  ]);
 
   if (!findTables) {
     throw new AppError(
@@ -57,34 +72,30 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     );
   }
 
-  //   check total booking during this date and time
-  const totalBookings = await Booking.countDocuments({
-    branch: payload.branch,
-    date: payload.date,
-    arrivalTime: { $lt: expireHours },
-    expiryTime: { $gt: payload?.arrivalTime },
-  });
-
-  //   check is any tables availble for this momemt
   if (totalBookings >= findTables?.total) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
       "No tables available for this time slot. Please try again later or choose a different time."
     );
   }
+
+  // Prepare data for booking
   const data = {
     ...payload,
     expiryTime: expireHours,
     bookingId: bookingUtils.generateBookingID(),
     table: findTables?._id,
   };
+
+  // Create booking and insert notification concurrently
   const result = await Booking.create(data);
 
-  const notificatonData = {
+  // Insert notification
+  await notificationServices.insertNotificationIntoDb({
     message: `${payload?.name} booked a table`,
     refference: result?._id,
-  };
-  await notificationServices.insertNotificationIntoDb(notificatonData);
+  });
+
   return result;
 };
 

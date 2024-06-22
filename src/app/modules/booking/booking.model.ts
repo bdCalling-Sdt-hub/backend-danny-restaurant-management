@@ -23,6 +23,7 @@ const bookingSchema = new Schema<TBooking>(
       type: mongoose.Types.ObjectId,
       ref: "Branch",
       required: true,
+      index: true,
     },
     seats: {
       type: Number,
@@ -31,14 +32,17 @@ const bookingSchema = new Schema<TBooking>(
     date: {
       type: String,
       required: true,
+      index: true,
     },
     arrivalTime: {
       type: String,
       required: true,
+      index: true,
     },
     expiryTime: {
       type: String,
       required: true,
+      index: true,
     },
     bookingId: {
       type: String,
@@ -50,6 +54,7 @@ const bookingSchema = new Schema<TBooking>(
       enum: Object.values(BStatus),
       default: "onGoing",
       required: true,
+      index: true,
     },
     isDeleted: {
       type: Boolean,
