@@ -281,11 +281,63 @@ const cancelBooking = async (bookingId: string) => {
 
   // Proceed with cancellation logic
   const result = await Booking.findByIdAndUpdate(bookingId, {
-    status: "cancelled",
+    status: "canCelled",
   });
 
   return result;
 };
+
+const getBookingStatics = async (year: string) => {
+  const monthsOfYear = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  const result = await Booking.aggregate([
+    {
+      $match: {
+        date: {
+          $gte: `${year}-01-01`,
+          $lt: `${Number(year) + 1}-01-01`,
+        },
+      },
+    },
+    {
+      $addFields: {
+        dateObj: {
+          $dateFromString: { dateString: "$date", format: "%Y-%m-%d" },
+        },
+      },
+    },
+    {
+      $group: {
+        _id: { $month: "$dateObj" },
+        totalBooking: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        month: "$_id",
+        totalBooking: 1,
+        _id: 0,
+      },
+    },
+    {
+      $sort: { month: 1 },
+    },
+  ]);
+
+  // Merge with monthsOfYear array to include all months in the result
+  const finalResult = monthsOfYear.map((month) => {
+    const match = result.find((item) => item.month === month);
+    return {
+      month: new Date(`${year}-${month}-01`).toLocaleString("en", {
+        month: "short",
+      }),
+      totalBooking: match ? match.totalBooking : 0,
+    };
+  });
+
+  return finalResult;
+};
+
 export const bookingServices = {
   insertBookingIntoDB,
   findAllBooking,
@@ -295,4 +347,5 @@ export const bookingServices = {
   deleteBooking,
   closeBooking,
   cancelBooking,
+  getBookingStatics,
 };

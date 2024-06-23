@@ -73,6 +73,17 @@ const canCelBooking = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const bookingStatics = catchAsync(async (req: Request, res: Response) => {
+  const result = await bookingServices.getBookingStatics(
+    req?.query?.year as string
+  );
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reservations data retrived successfully",
+    data: result,
+  });
+});
 
 export const bookingControllers = {
   insertBookingIntoDB,
@@ -82,4 +93,5 @@ export const bookingControllers = {
   findAllReservationBybranch,
   deleteBooking,
   canCelBooking,
+  bookingStatics,
 };

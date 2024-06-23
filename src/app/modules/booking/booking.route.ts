@@ -12,6 +12,11 @@ router.get(
   auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
   bookingControllers.findAllReservationBybranch
 );
+router.get(
+  "/statics",
+  auth(USER_ROLE.super_admin),
+  bookingControllers.bookingStatics
+);
 router.patch("/cancel/:id", bookingControllers.canCelBooking);
 router.get(
   "/",
