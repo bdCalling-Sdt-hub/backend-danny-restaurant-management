@@ -26,6 +26,7 @@ const getAllBooking = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getSingleBooking = catchAsync(async (req: Request, res: Response) => {
+  console.log(req.params.id);
   const result = await bookingServices.getSingleBooking(req.params.id);
   sendResponse(res, {
     statusCode: 200,
@@ -63,6 +64,15 @@ const deleteBooking = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const canCelBooking = catchAsync(async (req: Request, res: Response) => {
+  const result = await bookingServices.cancelBooking(req.params.id);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reservation cancelled successfully",
+    data: result,
+  });
+});
 
 export const bookingControllers = {
   insertBookingIntoDB,
@@ -71,4 +81,5 @@ export const bookingControllers = {
   updateBooking,
   findAllReservationBybranch,
   deleteBooking,
+  canCelBooking,
 };

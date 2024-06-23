@@ -113,7 +113,8 @@ const insertBookingIntoDB = async (payload: TBooking) => {
       date: payload?.date,
       seats: payload?.seats,
       arrivalTime: payload?.arrivalTime,
-      expiryTime: payload?.expiryTime,
+      expiryTime: result?.expiryTime,
+      link: `http://localhost:5174/cancel/${result?._id}`,
     };
     const htmlToSend = template(emailContext);
     // Define the email options
@@ -258,6 +259,33 @@ const closeBooking = async () => {
   return result;
 };
 
+const cancelBooking = async (bookingId: string) => {
+  // Fetch the booking from the database
+  const booking = await Booking.findById(bookingId);
+  if (!booking) {
+    throw new AppError(httpStatus.NOT_FOUND, "Reservation not found");
+  }
+
+  if (booking?.status === "canCelled") {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      "This reservation has already been cancelled."
+    );
+  }
+  if (booking?.status === "closed") {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      "This reservation is already closed."
+    );
+  }
+
+  // Proceed with cancellation logic
+  const result = await Booking.findByIdAndUpdate(bookingId, {
+    status: "cancelled",
+  });
+
+  return result;
+};
 export const bookingServices = {
   insertBookingIntoDB,
   findAllBooking,
@@ -266,4 +294,5 @@ export const bookingServices = {
   allBranchesBooking,
   deleteBooking,
   closeBooking,
+  cancelBooking,
 };

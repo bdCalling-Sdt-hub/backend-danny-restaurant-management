@@ -12,6 +12,7 @@ router.get(
   auth(USER_ROLE.super_admin, USER_ROLE.sub_admin),
   bookingControllers.findAllReservationBybranch
 );
+router.patch("/cancel/:id", bookingControllers.canCelBooking);
 router.get(
   "/",
   auth(USER_ROLE.sub_admin, USER_ROLE.super_admin),
