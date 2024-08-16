@@ -7,7 +7,7 @@ import { branchValidation } from "./branch.validation";
 const router = Router();
 router.post(
   "/",
-  validateRequest(branchValidation.createBranchSchema),
+  // validateRequest(branchValidation.createBranchSchema),
   auth(USER_ROLE.super_admin),
   branchControllers.insertBranchIntoDb
 );
