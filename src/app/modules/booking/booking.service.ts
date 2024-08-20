@@ -114,7 +114,7 @@ const insertBookingIntoDB = async (payload: TBooking) => {
       seats: payload?.seats,
       arrivalTime: payload?.arrivalTime,
       expiryTime: result?.expiryTime,
-      link: `http://localhost:5174/cancel/${result?._id}`,
+      link: `https://mamnon.de/cancel/${result?._id}`,
     };
     const htmlToSend = template(emailContext);
     // Define the email options
