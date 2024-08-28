@@ -8,7 +8,7 @@ const upload = fileUpload("./public/uploads/profile/");
 const router = Router();
 router.post(
   "/create-user",
-  // auth(USER_ROLE.super_admin),
+  auth(USER_ROLE.super_admin),
   upload.single("file"),
   parseData(),
   userControllers.insertuserIntoDb
