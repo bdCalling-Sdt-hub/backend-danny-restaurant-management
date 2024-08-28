@@ -106,6 +106,7 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     if (err) {
       console.error("Error reading the HTML file:", err);
     }
+    console.log(payload.arrivalTime);
     const template = handlebars.compile(htmlContent);
     const emailContext = {
       name: payload?.name,
@@ -113,7 +114,7 @@ const insertBookingIntoDB = async (payload: TBooking) => {
       date: payload?.date,
       seats: payload?.seats,
       arrivalTime: payload?.arrivalTime,
-      expiryTime: result?.expiryTime,
+      expiryTime: bookingUtils.addFifteenMinutes(payload?.arrivalTime),
       link: `https://mamnon.de/cancel/${result?._id}`,
     };
     const htmlToSend = template(emailContext);

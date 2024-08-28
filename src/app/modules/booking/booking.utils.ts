@@ -2,7 +2,6 @@ import moment from "moment";
 import { Booking } from "./booking.model";
 
 const calculateExpires = (arrivalTime: string, limit: number) => {
-  console.log(arrivalTime, limit);
   return moment(arrivalTime, "HH:mm")
     .add(limit, "minutes") // Change "hours" to "minutes"
     .subtract(1, "minute")
@@ -43,10 +42,21 @@ const generateBookingID = (): string => {
   const randomNumber = Math.floor(10000000 + Math.random() * 90000000);
   return `${randomNumber}${Date.now()}`.slice(0, 8);
 };
+const addFifteenMinutes = (time: string) => {
+  if (!time) {
+    throw new Error("Invalid time input");
+  }
+
+  // Parse the time and add 15 minutes
+  const newTime = moment(time, "HH:mm").add(15, "minutes").format("HH:mm");
+
+  return newTime;
+};
 
 export const bookingUtils = {
   calculateExpires,
   isTableAvailable,
   isTimeWithinRange,
   generateBookingID,
+  addFifteenMinutes,
 };

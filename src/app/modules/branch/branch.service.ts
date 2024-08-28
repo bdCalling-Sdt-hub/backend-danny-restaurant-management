@@ -1,8 +1,8 @@
+import mongoose from "mongoose";
 import { TBranch } from "./branch.interface";
 import { Branch } from "./branch.model";
 
 const insertBranchIntoDB = async (payload: TBranch) => {
-  console.log(payload);
   const result = await Branch.create(payload);
   return result;
 };
@@ -14,6 +14,11 @@ const getAllBranch = async () => {
 
 const getOpenandCloseTime = async (id: string) => {
   const result: any = Branch.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(id), // Ensure the ID is correctly formatted as an ObjectId
+      },
+    },
     {
       $project: {
         branch: "$name",
