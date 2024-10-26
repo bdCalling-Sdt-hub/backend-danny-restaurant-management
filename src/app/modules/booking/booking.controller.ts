@@ -13,9 +13,10 @@ const insertBookingIntoDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getAllBooking = catchAsync(async (req: Request, res: Response) => {
-  const query = { ...req.query };
-  if (req?.user?.branch) query["branch"] = req?.user?.branch;
-  const result = await bookingServices.findAllBooking(query, req?.user?.userId);
+  const result = await bookingServices.findAllBooking(
+    req.query,
+    req?.user?.userId
+  );
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -45,7 +46,9 @@ const updateBooking = catchAsync(async (req: Request, res: Response) => {
 });
 const findAllReservationBybranch = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await bookingServices.allBranchesBooking(req.query);
+    const query = { ...req.query };
+    if (req?.user?.branch) query["branch"] = req?.user?.branch;
+    const result = await bookingServices.allBranchesBooking(query);
     sendResponse(res, {
       statusCode: 200,
       success: true,
