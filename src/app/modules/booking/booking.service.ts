@@ -52,7 +52,6 @@ const insertBookingIntoDB = async (payload: TBooking) => {
       ...payload,
       expiryTime: expireHours,
       bookingId: bookingUtils.generateBookingID(),
-      seats: payload?.seats,
     };
     result = await Booking.create(data);
     return;

@@ -18,10 +18,7 @@ const bookingSchema = new Schema<TBooking>(
       type: mongoose.Types.ObjectId,
       ref: "Table",
     },
-    seats: {
-      type: Number,
-      default: 0,
-    },
+
     branch: {
       type: mongoose.Types.ObjectId,
       ref: "Branch",
