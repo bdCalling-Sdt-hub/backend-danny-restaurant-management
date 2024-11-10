@@ -13,7 +13,7 @@ const insertBookingIntoDB = catchAsync(async (req: Request, res: Response) => {
   if (req?.headers?.authorization) {
     try {
       decode = jwt.verify(
-        req.headers.authorization,
+        req?.headers?.authorization?.split(" ")[1],
         config.jwt_access_secret as string
       ) as JwtPayload;
     } catch (err) {
