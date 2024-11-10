@@ -6,7 +6,7 @@ import { bookingServices } from "./booking.service";
 const insertBookingIntoDB = catchAsync(async (req: Request, res: Response) => {
   const data = { ...req.body };
 
-  data["requestBy"] = req.user.role;
+  data["requestBy"] = req?.user?.role;
   const result = await bookingServices.insertBookingIntoDB(data);
   sendResponse(res, {
     statusCode: 200,
