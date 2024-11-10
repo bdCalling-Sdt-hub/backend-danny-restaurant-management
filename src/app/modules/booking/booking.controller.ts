@@ -7,6 +7,7 @@ const insertBookingIntoDB = catchAsync(async (req: Request, res: Response) => {
   const data = { ...req.body };
 
   data["requestBy"] = req?.user?.role;
+  console.log(data);
   const result = await bookingServices.insertBookingIntoDB(data);
   sendResponse(res, {
     statusCode: 200,
