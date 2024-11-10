@@ -4,7 +4,10 @@ import sendResponse from "../../utils/sendResponse";
 import { bookingServices } from "./booking.service";
 
 const insertBookingIntoDB = catchAsync(async (req: Request, res: Response) => {
-  const result = await bookingServices.insertBookingIntoDB(req.body);
+  const data = { ...req.body };
+
+  data["requestBy"] = req.user.role;
+  const result = await bookingServices.insertBookingIntoDB(data);
   sendResponse(res, {
     statusCode: 200,
     success: true,

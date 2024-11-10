@@ -10,7 +10,6 @@ const bookingSchema = new Schema<TBooking>(
     },
     email: {
       type: String,
-      required: true,
     },
     number: {
       type: Number,
@@ -18,6 +17,10 @@ const bookingSchema = new Schema<TBooking>(
     table: {
       type: mongoose.Types.ObjectId,
       ref: "Table",
+    },
+    seats: {
+      type: Number,
+      default: 0,
     },
     branch: {
       type: mongoose.Types.ObjectId,

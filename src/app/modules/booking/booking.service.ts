@@ -18,6 +18,7 @@ import { bookingUtils } from "./booking.utils";
 const insertBookingIntoDB = async (payload: TBooking) => {
   // Cache frequently accessed data
   const branchCache = new Map();
+  let result;
   // Find branch and check if it exists
   let findBranch: any = branchCache.get(payload.branch);
   if (!findBranch) {
@@ -37,7 +38,25 @@ const insertBookingIntoDB = async (payload: TBooking) => {
   if (findBranch.daysOfWeek === day) {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, `Branch is closed on ${day}`);
   }
+  const expireHours = bookingUtils.calculateExpires(
+    payload?.arrivalTime,
+    findBranch?.endTimeLimit
+  );
 
+  if (
+    payload?.requestBy === "admin" ||
+    payload?.requestBy === "sub_admin" ||
+    payload?.requestBy === "sup_admin"
+  ) {
+    const data = {
+      ...payload,
+      expiryTime: expireHours,
+      bookingId: bookingUtils.generateBookingID(),
+      seats: payload?.seats,
+    };
+    result = await Booking.create(data);
+    return;
+  }
   // Check if booking time is within branch hours
   const isWithinBranchHours = bookingUtils.isTimeWithinRange(
     payload.arrivalTime,
@@ -52,10 +71,10 @@ const insertBookingIntoDB = async (payload: TBooking) => {
   }
 
   // Calculate expire hours
-  const expireHours = bookingUtils.calculateExpires(
-    payload?.arrivalTime,
-    findBranch?.endTimeLimit
-  );
+  // const expireHours = bookingUtils.calculateExpires(
+  //   payload?.arrivalTime,
+  //   findBranch?.endTimeLimit
+  // );
 
   // Check available tables and total bookings concurrently
   const [findTables, totalBookings] = await Promise.all([
@@ -92,7 +111,7 @@ const insertBookingIntoDB = async (payload: TBooking) => {
   };
 
   // Create booking and insert notification concurrently
-  const result = await Booking.create(data);
+  result = await Booking.create(data);
 
   // Insert notification
   await notificationServices.insertNotificationIntoDb({
