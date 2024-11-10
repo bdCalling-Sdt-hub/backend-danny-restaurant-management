@@ -12,6 +12,6 @@ export interface TBooking {
   bookingId: string;
   isDeleted: boolean;
   table: ObjectId;
-  requestBy: "admin" | "sup_admin" | "sub_admin";
+  requestBy: "admin" | "super_admin" | "sub_admin";
   status: "onGoing" | "rejected" | "closed" | "canCelled";
 }
