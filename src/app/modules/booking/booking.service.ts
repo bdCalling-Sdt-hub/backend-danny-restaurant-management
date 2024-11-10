@@ -46,7 +46,7 @@ const insertBookingIntoDB = async (payload: TBooking) => {
   if (
     payload?.requestBy === "admin" ||
     payload?.requestBy === "sub_admin" ||
-    payload?.requestBy === "sup_admin"
+    payload?.requestBy === "super_admin"
   ) {
     const data = {
       ...payload,
