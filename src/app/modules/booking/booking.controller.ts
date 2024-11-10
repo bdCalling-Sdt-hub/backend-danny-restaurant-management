@@ -1,13 +1,26 @@
 import { Request, Response } from "express";
+import httpStatus from "http-status";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import config from "../../config";
+import AppError from "../../error/AppError";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { bookingServices } from "./booking.service";
-
 const insertBookingIntoDB = catchAsync(async (req: Request, res: Response) => {
   const data = { ...req.body };
 
-  data["requestBy"] = req?.user?.role;
-  console.log(req.user);
+  let decode;
+  if (req?.headers?.authorization) {
+    try {
+      decode = jwt.verify(
+        req.headers.authorization,
+        config.jwt_access_secret as string
+      ) as JwtPayload;
+    } catch (err) {
+      throw new AppError(httpStatus.UNAUTHORIZED, "unauthorized");
+    }
+  }
+  data["requestBy"] = decode?.role;
   console.log(data);
   const result = await bookingServices.insertBookingIntoDB(data);
   sendResponse(res, {
