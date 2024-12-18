@@ -25,7 +25,7 @@ app.use(
       "https://socket.mamnon.de",
       "https://mamnon.de",
     ],
-    credentials: true,
+    // credentials: true,
   })
 );
 // application routes
