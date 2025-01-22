@@ -167,6 +167,10 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     }
     branchCache.set(payload.branch, findBranch);
   }
+  const expireHours = bookingUtils.calculateExpires(
+    payload?.arrivalTime,
+    findBranch?.endTimeLimit
+  );
 
   // Convert date and check if branch is closed
   const date = moment(payload.date, "YYYY-MM-DD");
@@ -175,10 +179,22 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, `Branch is closed on ${day}`);
   }
 
-  const expireHours = bookingUtils.calculateExpires(
-    payload?.arrivalTime,
-    findBranch?.endTimeLimit
-  );
+  // Check for date-wise time-specific blocking in branch's blockedSlots
+  const isBlocked = findBranch?.timeBlocks?.some((slot: any) => {
+    return (
+      slot.date === payload.date &&
+      ((slot.startTime <= payload.arrivalTime &&
+        slot.endTime >= payload.arrivalTime) ||
+        (slot.startTime <= expireHours && slot.endTime >= expireHours))
+    );
+  });
+
+  if (isBlocked) {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      `Bookings are not allowed during this time slot on ${payload.date}. Please choose a different time.`
+    );
+  }
 
   if (
     payload?.requestBy === "admin" ||
