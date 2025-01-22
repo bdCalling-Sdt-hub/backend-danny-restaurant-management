@@ -11,6 +11,14 @@ const branchSchema = new Schema<TBranch>(
       type: String,
       required: true,
     },
+
+    timeBlocks: [
+      {
+        date: String,
+        startTime: String,
+        endTime: String,
+      },
+    ],
     daysOfWeek: {
       type: String,
       enum: Object.values(daysOfWeek),

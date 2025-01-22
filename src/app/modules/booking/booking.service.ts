@@ -15,11 +15,147 @@ import { TBooking } from "./booking.interface";
 import { Booking } from "./booking.model";
 import { bookingUtils } from "./booking.utils";
 
+// const insertBookingIntoDB = async (payload: TBooking) => {
+//   // Cache frequently accessed data
+//   const branchCache = new Map();
+//   let result;
+//   // Find branch and check if it exists
+//   let findBranch: any = branchCache.get(payload.branch);
+//   if (!findBranch) {
+//     findBranch = await Branch.findById(payload.branch);
+//     if (!findBranch) {
+//       throw new AppError(
+//         httpStatus.NOT_FOUND,
+//         "Branch information not found! Please try again"
+//       );
+//     }
+//     branchCache.set(payload.branch, findBranch);
+//   }
+
+//   // Convert date and check if branch is closed on that day
+//   const date = moment(payload.date, "YYYY-MM-DD");
+//   const day = date.format("dddd").toLowerCase();
+//   if (findBranch.daysOfWeek === day) {
+//     throw new AppError(httpStatus.NOT_ACCEPTABLE, `Branch is closed on ${day}`);
+//   }
+//   const expireHours = bookingUtils.calculateExpires(
+//     payload?.arrivalTime,
+//     findBranch?.endTimeLimit
+//   );
+
+//   if (
+//     payload?.requestBy === "admin" ||
+//     payload?.requestBy === "sub_admin" ||
+//     payload?.requestBy === "super_admin"
+//   ) {
+//     const data = {
+//       ...payload,
+//       expiryTime: expireHours,
+//       bookingId: bookingUtils.generateBookingID(),
+//     };
+//     result = await Booking.create(data);
+//     return;
+//   }
+//   // Check if booking time is within branch hours
+//   const isWithinBranchHours = bookingUtils.isTimeWithinRange(
+//     payload.arrivalTime,
+//     findBranch[day].openTime,
+//     findBranch[day].closeTime
+//   );
+//   if (!isWithinBranchHours) {
+//     throw new AppError(
+//       httpStatus.NOT_ACCEPTABLE,
+//       "Booking time conflicts with branch operating hours. Please choose a different time slot."
+//     );
+//   }
+
+//   // Calculate expire hours
+//   // const expireHours = bookingUtils.calculateExpires(
+//   //   payload?.arrivalTime,
+//   //   findBranch?.endTimeLimit
+//   // );
+
+//   // Check available tables and total bookings concurrently
+//   const [findTables, totalBookings] = await Promise.all([
+//     Table.findOne({ branch: payload.branch, seats: payload.seats }),
+//     Booking.countDocuments({
+//       branch: payload.branch,
+//       date: payload.date,
+//       status: "onGoing",
+//       arrivalTime: { $lt: expireHours },
+//       expiryTime: { $gt: payload?.arrivalTime },
+//     }),
+//   ]);
+
+//   if (!findTables) {
+//     throw new AppError(
+//       httpStatus.NOT_FOUND,
+//       "No tables found for this number of seats"
+//     );
+//   }
+
+//   if (totalBookings >= findTables?.total) {
+//     throw new AppError(
+//       httpStatus.NOT_ACCEPTABLE,
+//       "No tables available for this time slot. Please try again later or choose a different time."
+//     );
+//   }
+
+//   // Prepare data for booking
+//   const data = {
+//     ...payload,
+//     expiryTime: expireHours,
+//     bookingId: bookingUtils.generateBookingID(),
+//     table: findTables?._id,
+//   };
+
+//   // Create booking and insert notification concurrently
+//   result = await Booking.create(data);
+
+//   // Insert notification
+//   await notificationServices.insertNotificationIntoDb({
+//     message: `${payload?.name} booked a table`,
+//     refference: result?._id,
+//   });
+
+//   // sending email
+//   const templatePath = path.resolve(__dirname, "../../../../public.html");
+//   fs.readFile(templatePath, "utf8", async (err, htmlContent) => {
+//     if (err) {
+//       console.error("Error reading the HTML file:", err);
+//     }
+//     const template = handlebars.compile(htmlContent);
+//     const emailContext = {
+//       name: payload?.name,
+//       email: payload?.email,
+//       date: payload?.date,
+//       seats: payload?.seats,
+//       arrivalTime: payload?.arrivalTime,
+//       expiryTime: bookingUtils.addFifteenMinutes(payload?.arrivalTime),
+//       link: `https://mamnon.de/cancel/${result?._id}`,
+//       branch: findBranch?.name,
+//       address: findBranch?.location,
+//     };
+//     const htmlToSend = template(emailContext);
+//     // Define the email options
+
+//     await sendEmail(
+//       payload?.email,
+//       "Your Reservation was successfull",
+//       htmlToSend
+//     );
+//     // Send the email
+//   });
+
+//   return result;
+// };
+
+// getallBooking
 const insertBookingIntoDB = async (payload: TBooking) => {
-  // Cache frequently accessed data
   const branchCache = new Map();
   let result;
-  // Find branch and check if it exists
+
+  // Find branch and cache it
   let findBranch: any = branchCache.get(payload.branch);
   if (!findBranch) {
     findBranch = await Branch.findById(payload.branch);
@@ -32,12 +168,13 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     branchCache.set(payload.branch, findBranch);
   }
 
-  // Convert date and check if branch is closed on that day
+  // Convert date and check if branch is closed
   const date = moment(payload.date, "YYYY-MM-DD");
   const day = date.format("dddd").toLowerCase();
   if (findBranch.daysOfWeek === day) {
     throw new AppError(httpStatus.NOT_ACCEPTABLE, `Branch is closed on ${day}`);
   }
+
   const expireHours = bookingUtils.calculateExpires(
     payload?.arrivalTime,
     findBranch?.endTimeLimit
@@ -56,7 +193,7 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     result = await Booking.create(data);
     return;
   }
-  // Check if booking time is within branch hours
+
   const isWithinBranchHours = bookingUtils.isTimeWithinRange(
     payload.arrivalTime,
     findBranch[day].openTime,
@@ -69,30 +206,36 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     );
   }
 
-  // Calculate expire hours
-  // const expireHours = bookingUtils.calculateExpires(
-  //   payload?.arrivalTime,
-  //   findBranch?.endTimeLimit
-  // );
+  // Check tables with requested seats
+  let findTables = await Table.findOne({
+    branch: payload.branch,
+    seats: payload.seats,
+  });
 
-  // Check available tables and total bookings concurrently
-  const [findTables, totalBookings] = await Promise.all([
-    Table.findOne({ branch: payload.branch, seats: payload.seats }),
-    Booking.countDocuments({
+  if (!findTables) {
+    // Fallback to larger table if no exact match is found
+    findTables = await Table.findOne({
       branch: payload.branch,
-      date: payload.date,
-      status: "onGoing",
-      arrivalTime: { $lt: expireHours },
-      expiryTime: { $gt: payload?.arrivalTime },
-    }),
-  ]);
+      seats: { $gt: payload.seats },
+    });
+  }
 
   if (!findTables) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      "No tables found for this number of seats"
+      "No suitable tables available for the requested number of seats."
     );
   }
+
+  // Check if the table is available for the requested time
+  const totalBookings = await Booking.countDocuments({
+    branch: payload.branch,
+    date: payload.date,
+    table: findTables._id,
+    status: "onGoing",
+    arrivalTime: { $lt: expireHours },
+    expiryTime: { $gt: payload?.arrivalTime },
+  });
 
   if (totalBookings >= findTables?.total) {
     throw new AppError(
@@ -107,18 +250,17 @@ const insertBookingIntoDB = async (payload: TBooking) => {
     expiryTime: expireHours,
     bookingId: bookingUtils.generateBookingID(),
     table: findTables?._id,
+    seats: payload.seats, // Keep the requested seats for record
   };
 
-  // Create booking and insert notification concurrently
+  // Create booking and insert notification
   result = await Booking.create(data);
 
-  // Insert notification
   await notificationServices.insertNotificationIntoDb({
     message: `${payload?.name} booked a table`,
     refference: result?._id,
   });
 
-  // sending email
   const templatePath = path.resolve(__dirname, "../../../../public.html");
   fs.readFile(templatePath, "utf8", async (err, htmlContent) => {
     if (err) {
@@ -137,20 +279,16 @@ const insertBookingIntoDB = async (payload: TBooking) => {
       address: findBranch?.location,
     };
     const htmlToSend = template(emailContext);
-    // Define the email options
 
     await sendEmail(
       payload?.email,
-      "Your Reservation was successfull",
+      "Your Reservation was successful",
       htmlToSend
     );
-    // Send the email
   });
 
   return result;
 };
-
-// getallBooking
 
 const findAllBooking = async (query: Record<string, any>, userId: string) => {
   const bookingModel = new QueryBuilder(Booking.find(), query)

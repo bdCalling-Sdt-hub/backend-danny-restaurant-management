@@ -12,6 +12,7 @@ export interface TBranch {
   isDeleted: boolean;
   owner: ObjectId;
   tables: number;
+  timeBlocks: [];
   endTimeLimit: number;
   daysOfWeek: daysOfWeek;
   saturday: OpeningAndClosingTime;
