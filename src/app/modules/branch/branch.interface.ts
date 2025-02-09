@@ -11,6 +11,7 @@ export interface TBranch {
   location: string;
   isDeleted: boolean;
   owner: ObjectId;
+  emailTemplateText: string;
   tables: number;
   timeBlocks: [];
   endTimeLimit: number;

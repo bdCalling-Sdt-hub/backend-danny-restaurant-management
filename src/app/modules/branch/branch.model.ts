@@ -115,6 +115,10 @@ const branchSchema = new Schema<TBranch>(
       type: Number,
       default: 120,
     },
+    emailTemplateText: {
+      type: String,
+      default: "",
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -128,9 +132,13 @@ const branchSchema = new Schema<TBranch>(
 branchSchema.pre("save", function (next) {
   const branch = this;
   Object.values(daysOfWeek).forEach((day) => {
-    if (branch.daysOfWeek.includes(day)) {
+    // @ts-ignore
+    if (branch?.daysOfWeek.includes(day)) {
+      // @ts-ignore
       branch[day].isClosed = true;
+      // @ts-ignore
       branch[day].openTime = "00:00";
+      // @ts-ignore
       branch[day].closeTime = "00:00";
     }
   });

@@ -293,6 +293,7 @@ const insertBookingIntoDB = async (payload: TBooking) => {
       link: `https://mamnon.de/cancel/${result?._id}`,
       branch: findBranch?.name,
       address: findBranch?.location,
+      emailTemplateText: findBranch?.emailTemplateText,
     };
     const htmlToSend = template(emailContext);
 
