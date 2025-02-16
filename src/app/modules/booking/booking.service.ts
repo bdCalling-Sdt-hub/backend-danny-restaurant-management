@@ -256,7 +256,7 @@ const insertBookingIntoDB = async (payload: TBooking) => {
   if (totalBookings >= findTables?.total) {
     throw new AppError(
       httpStatus.NOT_ACCEPTABLE,
-      "No tables available for this time slot. Please try again later or choose a different time."
+      "Hier  passt etwas nicht, es kann sein das unsere maximalen Reservierungen erreicht sind Wir haben aber die selbe anzahl an Tische noch verfügbar für spontane Gäste. Deswegen bitte ich sie einfach vorbei zukommen und erwas Geduld mitzubringen. Wenn ihre Gruppe mehr als 8 Personen sind dann schreiben sie uns bitte eine Email da diese Gesondert geprüft wird."
     );
   }
 
@@ -405,6 +405,7 @@ const allBranchesBooking = async (filters: Record<string, any>) => {
         email: 1,
         branch: { $arrayElemAt: ["$branch.name", 0] },
         seats: 1,
+        specialNote: 1,
         date: 1,
         time: "$arrivalTime",
         bookingId: 1,
@@ -416,6 +417,7 @@ const allBranchesBooking = async (filters: Record<string, any>) => {
   );
 
   const result = await Booking.aggregate(pipeline);
+
   return result;
 };
 

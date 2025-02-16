@@ -44,6 +44,10 @@ const bookingSchema = new Schema<TBooking>(
       required: true,
       index: true,
     },
+    specialNote: {
+      type: String,
+      default: "",
+    },
     bookingId: {
       type: String,
       unique: true,
