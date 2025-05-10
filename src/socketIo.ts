@@ -4,7 +4,8 @@ import { Server } from "socket.io";
 const initializeSocketIO = (server: HttpServer) => {
   const io = new Server(server, {
     cors: {
-      origin: ["https://dashboard.mamnon.de", "https://mamnon.de", "*"],
+      origin: ["https://dashboard.mamnon.de", "https://mamnon.de"],
+      credentials: true,
     },
     // reconnection: true,
     // reconnectionAttempts: 3, // Number of reconnection attempts
