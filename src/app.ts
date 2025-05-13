@@ -16,8 +16,11 @@ app.use(express.static("public"));
 
 app.use(
   cors({
-    origin: true,
-    credentials: true,
+    origin: [
+      "https://mamnon.de",
+      "https:dashboard.mamnon.de",
+      "https://socket.mamnon.de",
+    ],
     methods: ["GET", "POST", "DELETE", "PATCH"],
   })
 );
