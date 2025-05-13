@@ -18,7 +18,7 @@ app.use(
   cors({
     origin: [
       "https://mamnon.de",
-      "https:dashboard.mamnon.de",
+      "https//:dashboard.mamnon.de",
       "https://socket.mamnon.de",
     ],
     methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
