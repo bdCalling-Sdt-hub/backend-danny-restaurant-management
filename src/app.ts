@@ -21,7 +21,7 @@ app.use(
       "https:dashboard.mamnon.de",
       "https://socket.mamnon.de",
     ],
-    methods: ["GET", "POST", "DELETE", "PATCH"],
+    methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
   })
 );
 app.use(express.json());
