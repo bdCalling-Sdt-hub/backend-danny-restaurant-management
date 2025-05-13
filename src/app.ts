@@ -13,21 +13,30 @@ const app: Application = express();
 app.use(express.static("public"));
 
 //parsers
-app.use(express.json());
-app.use(cookieParser());
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://143.198.197.69:5173",
-      "https://dashboard.mamnon.de",
-      "https://socket.mamnon.de",
-      "https://mamnon.de",
-    ],
-    // credentials: true,
+    origin: true,
+    credentials: true,
+    methods: ["GET", "POST", "DELETE", "PATCH"],
   })
 );
+app.use(express.json());
+app.use(cookieParser());
+
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:5173",
+//       "http://localhost:5174",
+//       "http://143.198.197.69:5173",
+//       "https://dashboard.mamnon.de",
+//       "https://socket.mamnon.de",
+//       "https://mamnon.de",
+//     ],
+//     // credentials: true,
+//   })
+// );
 // application routes
 app.use("/api/v1", router);
 app.get("/", (req: Request, res: Response) => {
